@@ -22,22 +22,18 @@ import (
 //   created_at   time.Time
 //   client_id    string (foreign key)
 // access_data:
-//   access_token  			string
-//   refresh_token			string
-//   expires_in			    int32
-//   scope					string
+//   access_token           string
+//   refresh_token          string
+//   expires_in	            int32
+//   scope                  string
 //   redirect_uri           string
-//   created_at				time.Time
+//   created_at	            time.Time
 //   authorize_data_code    string (foreign key)
 //   prev_access_data_token string (foreign key)
-//   client_id 				string (foreign key)
+//   client_id              string (foreign key)
 
 type SQLStorage struct {
-	authDB              *sql.DB
-	clientIDColumn      string
-	clientTable         string
-	authorizeCodeColumn string
-	authorizeTable      string
+	authDB *sql.DB
 }
 
 func NewSQLStorage(authDB *sql.DB) *SQLStorage {
@@ -161,7 +157,7 @@ func (store *SQLStorage) SaveAccess(accessData *osin.AccessData) error {
 	return err
 }
 
-// loadAccess loads all of the access data except for the previous access data token
+// loadAccess loads all of the access data except for the foreign key data
 // (to avoid loading the entire chain of access data)
 func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.AccessData, string, string, string, error) {
 	var (
