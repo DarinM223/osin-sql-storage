@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/RangelReale/osin"
+	"time"
 )
 
 // The database that stores the oauth2 data has to have the following schema:
@@ -11,9 +12,32 @@ import (
 //   id           string
 //   secret       string
 //   redirect_uri string
+//   user_id      string
+// authorize_data:
+//   code         string
+//   expires_in   int32
+//   scope        string
+//   redirect_uri string
+//   state        string
+//   created_at   time.Time
+//   client_id    string (foreign key)
+// access_data:
+//   access_token  			string
+//   refresh_token			string
+//   expires_in			    int32
+//   scope					string
+//   redirect_uri           string
+//   created_at				time.Time
+//   authorize_data_code    string (foreign key)
+//   prev_access_data_token string (foreign key)
+//   client_id 				string (foreign key)
 
 type SQLStorage struct {
-	authDB *sql.DB
+	authDB              *sql.DB
+	clientIDColumn      string
+	clientTable         string
+	authorizeCodeColumn string
+	authorizeTable      string
 }
 
 func NewSQLStorage(authDB *sql.DB) *SQLStorage {
@@ -27,6 +51,7 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 		clientID    string
 		secret      string
 		redirectURI string
+		userID      int
 	)
 
 	rows, err := store.authDB.Query("SELECT * FROM clients WHERE id = ?", id)
@@ -36,7 +61,7 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&clientID, &secret, &redirectURI)
+		err := rows.Scan(&clientID, &secret, &redirectURI, &userID)
 		if err != nil {
 			return nil, err
 		}
@@ -45,6 +70,7 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 			Id:          clientID,
 			Secret:      secret,
 			RedirectUri: redirectURI,
+			UserData:    userID,
 		}, nil
 	}
 
@@ -52,33 +78,194 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 }
 
 func (store *SQLStorage) SaveAuthorize(authorizeData *osin.AuthorizeData) error {
-	return errors.New("Implement this")
+	stmt, err := store.authDB.Prepare(`
+		INSERT INTO authorize_data(code, expires_in, scope, redirect_uri, state, created_at, client_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+		`)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(authorizeData.Code, authorizeData.ExpiresIn, authorizeData.Scope,
+		authorizeData.RedirectUri, authorizeData.State, authorizeData.CreatedAt, authorizeData.Client.GetId())
+	return err
 }
 
-func (store *SQLStorage) LoadAuthorize(authorizeData *osin.AuthorizeData) (*osin.AuthorizeData, error) {
-	return nil, errors.New("Implement this")
+func (store *SQLStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error) {
+	var (
+		authCode    string
+		expiresIn   int32
+		scope       string
+		redirectURI string
+		state       string
+		createdAt   time.Time
+		clientID    string
+	)
+
+	rows, err := store.authDB.Query("SELECT * FROM authorize_data WHERE code = ?", code)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&authCode, &expiresIn, &scope, &redirectURI, &state, &createdAt, &clientID)
+		if err != nil {
+			return nil, err
+		}
+		break
+	}
+
+	// Retrieve the client from the client id
+	client, err := store.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+
+	authData := &osin.AuthorizeData{
+		Code:        authCode,
+		ExpiresIn:   expiresIn,
+		Scope:       scope,
+		RedirectUri: redirectURI,
+		State:       state,
+		CreatedAt:   createdAt,
+		Client:      client,
+	}
+
+	return authData, nil
 }
 
 func (store *SQLStorage) RemoveAuthorize(code string) error {
-	return errors.New("Implement this")
+	stmt, err := store.authDB.Prepare("DELETE FROM authorize_data WHERE code = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(code)
+	return err
 }
 
 func (store *SQLStorage) SaveAccess(accessData *osin.AccessData) error {
-	return errors.New("Implement this")
+	stmt, err := store.authDB.Prepare(`
+		INSERT INTO access_data(authorize_data_code, prev_access_data_token, access_token, refresh_token,
+		expires_in, scope, redirect_uri, created_at)
+		VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+		`)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(accessData.AuthorizeData.Code, accessData.AccessData.AccessToken,
+		accessData.AccessToken, accessData.RefreshToken, accessData.ExpiresIn, accessData.Scope,
+		accessData.RedirectUri, accessData.CreatedAt)
+	return err
+}
+
+// loadAccess loads all of the access data except for the previous access data token
+// (to avoid loading the entire chain of access data)
+func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.AccessData, string, string, string, error) {
+	var (
+		accessToken         string
+		refreshToken        string
+		expiresIn           int32
+		scope               string
+		redirectURI         string
+		createdAt           time.Time
+		authorizeDataCode   string
+		prevAccessDataToken string
+		clientID            string
+	)
+
+	var rows *sql.Rows
+	var err error
+	if len(isRefresh) > 0 && isRefresh[0] == true {
+		rows, err = store.authDB.Query("SELECT * FROM access_data WHERE refresh_token = ?", token)
+	} else {
+		rows, err = store.authDB.Query("SELECT * FROM access_data WHERE access_token = ?", token)
+	}
+
+	if err != nil {
+		return nil, "", "", "", err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&accessToken, &refreshToken,
+			&expiresIn, &scope, &redirectURI, &createdAt, &authorizeDataCode, &prevAccessDataToken, &clientID)
+		if err != nil {
+			return nil, "", "", "", err
+		}
+		break
+	}
+
+	return &osin.AccessData{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    expiresIn,
+		Scope:        scope,
+		RedirectUri:  redirectURI,
+		CreatedAt:    createdAt,
+	}, authorizeDataCode, prevAccessDataToken, clientID, err
 }
 
 func (store *SQLStorage) LoadAccess(token string) (*osin.AccessData, error) {
-	return nil, errors.New("Implement this")
+	accessData, authDataCode, prevAccessDataToken, clientID, err := store.loadAccess(token)
+	// load previous access data
+	prevAccessData, _, _, _, err := store.loadAccess(prevAccessDataToken)
+	if err != nil {
+		return nil, err
+	}
+	// laod client data
+	client, err := store.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+	// load authorize data
+	authData, err := store.LoadAuthorize(authDataCode)
+
+	accessData.Client = client
+	accessData.AuthorizeData = authData
+	accessData.AccessData = prevAccessData
+	return accessData, err
 }
 
 func (store *SQLStorage) RemoveAccess(token string) error {
-	return errors.New("Implement this")
+	stmt, err := store.authDB.Prepare("DELETE FROM access_data WHERE access_token = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(token)
+	return err
 }
 
-func LoadRefresh(token string) (*osin.AccessData, error) {
-	return nil, errors.New("Implement this")
+func (store *SQLStorage) LoadRefresh(token string) (*osin.AccessData, error) {
+	accessData, authDataCode, prevAccessDataToken, clientID, err := store.loadAccess(token, true)
+	// load previous access data
+	prevAccessData, _, _, _, err := store.loadAccess(prevAccessDataToken)
+	if err != nil {
+		return nil, err
+	}
+	// laod client data
+	client, err := store.GetClient(clientID)
+	if err != nil {
+		return nil, err
+	}
+	// load authorize data
+	authData, err := store.LoadAuthorize(authDataCode)
+
+	accessData.Client = client
+	accessData.AuthorizeData = authData
+	accessData.AccessData = prevAccessData
+	return accessData, err
 }
 
-func RemoveRefresh(token string) error {
-	return errors.New("Implement this")
+func (store *SQLStorage) RemoveRefresh(token string) error {
+	stmt, err := store.authDB.Prepare("DELETE FROM access_data WHERE refresh_token = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(token)
+	return err
 }
