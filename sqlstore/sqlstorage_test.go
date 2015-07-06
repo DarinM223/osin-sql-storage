@@ -119,6 +119,36 @@ func TestAuthorize(t *testing.T) {
 	assert.Nil(err)
 }
 
+// compareAccessData compares the returned access data to the setup "test" access data to
+// check if the data is being properly saved and loaded
+func compareAccessData(accessToken string, retAccessData *osin.AccessData, assert *assert.Assertions) {
+	// test if client is properly loaded
+	assert.Equal(retAccessData.Client.GetId(), "testclient")
+	assert.Equal(retAccessData.Client.GetSecret(), "testsecret")
+	assert.Equal(retAccessData.Client.GetRedirectUri(), "testredirect")
+	assert.Equal(retAccessData.Client.GetUserData().(string), "testuserid")
+
+	// test if auth data is properly loaded
+	assert.Equal(retAccessData.AuthorizeData.Code, "testcode")
+	assert.Equal(retAccessData.AuthorizeData.ExpiresIn, int32(100))
+	assert.Equal(retAccessData.AuthorizeData.Scope, "testscope")
+	assert.Equal(retAccessData.AuthorizeData.RedirectUri, "testredirect")
+	assert.Equal(retAccessData.AuthorizeData.State, "teststate")
+	if !retAccessData.AuthorizeData.CreatedAt.Equal(time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)) {
+		assert.Error(errors.New("The created_at dates are not equal"))
+	}
+
+	// test other fields
+	assert.Equal(retAccessData.AccessToken, accessToken)
+	assert.Equal(retAccessData.RefreshToken, "testrefresh")
+	assert.Equal(retAccessData.ExpiresIn, int32(100))
+	assert.Equal(retAccessData.Scope, "testscope")
+	assert.Equal(retAccessData.RedirectUri, "testredirect")
+	if !retAccessData.CreatedAt.Equal(time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)) {
+		assert.Error(errors.New("The created_at dates are not equal"))
+	}
+}
+
 // TestAccessEmptyPrevToken tests saving, loading, and removing access data with an empty AccessData field
 func TestAccessEmptyPrevToken(t *testing.T) {
 	assert := assert.New(t)
@@ -141,38 +171,97 @@ func TestAccessEmptyPrevToken(t *testing.T) {
 	retAccessData, err := sqlStore.LoadAccess("testaccesstoken")
 	assert.Nil(err)
 
-	// test if client is properly loaded
-	assert.Equal(retAccessData.Client.GetId(), "testclient")
-	assert.Equal(retAccessData.Client.GetSecret(), "testsecret")
-	assert.Equal(retAccessData.Client.GetRedirectUri(), "testredirect")
-	assert.Equal(retAccessData.Client.GetUserData().(string), "testuserid")
+	compareAccessData("testaccesstoken", retAccessData, assert)
 
-	// test if auth data is properly loaded
-	assert.Equal(retAccessData.AuthorizeData.Code, "testcode")
-	assert.Equal(retAccessData.AuthorizeData.ExpiresIn, int32(100))
-	assert.Equal(retAccessData.AuthorizeData.Scope, "testscope")
-	assert.Equal(retAccessData.AuthorizeData.RedirectUri, "testredirect")
-	assert.Equal(retAccessData.AuthorizeData.State, "teststate")
-	if !retAccessData.AuthorizeData.CreatedAt.Equal(time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)) {
-		assert.Error(errors.New("The created_at dates are not equal"))
+	err = sqlStore.RemoveAuthorize("testcode")
+	assert.Nil(err)
+	err = sqlStore.RemoveAccess("testaccesstoken")
+	assert.Nil(err)
+}
+
+// TestAccessNonEmptyPrevToken tests saving, loading, and removing access data with a nonempty AccessData field
+func TestAccessNonEmptyPrevToken(t *testing.T) {
+	assert := assert.New(t)
+
+	authData := setupAuthData(assert)
+
+	// Set up access data objects so that
+	// beforePrevAccessData -> prevAccessData -> accessData
+	// if load the access data for accessData we should only get the fields for
+	// accessData and prevAccessData not beforePrevAccessData since the AccessData field
+	// is only for the previous refresh token and loading the entire access data chain to retrieve
+	// one object is inefficient
+	// Also if accessData is loaded, prevAccessData's fields for Client and AuthorizeData are not loaded either
+
+	beforePrevAccessData := &osin.AccessData{
+		Client:        client,
+		AuthorizeData: authData,
+		AccessToken:   "testaccesstoken1",
+		RefreshToken:  "testrefresh",
+		ExpiresIn:     100,
+		Scope:         "testscope",
+		RedirectUri:   "testredirect",
+		CreatedAt:     time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local),
 	}
 
-	// test other fields
-	assert.Equal(retAccessData.AccessToken, "testaccesstoken")
-	assert.Equal(retAccessData.RefreshToken, "testrefresh")
-	assert.Equal(retAccessData.ExpiresIn, int32(100))
-	assert.Equal(retAccessData.Scope, "testscope")
-	assert.Equal(retAccessData.RedirectUri, "testredirect")
-	if !retAccessData.CreatedAt.Equal(time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)) {
+	prevAccessData := &osin.AccessData{
+		AccessData:    beforePrevAccessData,
+		Client:        client,
+		AuthorizeData: authData,
+		AccessToken:   "testaccesstoken2",
+		RefreshToken:  "testrefresh",
+		ExpiresIn:     100,
+		Scope:         "testscope",
+		RedirectUri:   "testredirect",
+		CreatedAt:     time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local),
+	}
+
+	accessData := &osin.AccessData{
+		AccessData:    prevAccessData,
+		Client:        client,
+		AuthorizeData: authData,
+		AccessToken:   "testaccesstoken3",
+		RefreshToken:  "testrefresh",
+		ExpiresIn:     100,
+		Scope:         "testscope",
+		RedirectUri:   "testredirect",
+		CreatedAt:     time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local),
+	}
+
+	err := sqlStore.SaveAccess(beforePrevAccessData)
+	assert.Nil(err)
+	err = sqlStore.SaveAccess(prevAccessData)
+	assert.Nil(err)
+	err = sqlStore.SaveAccess(accessData)
+	assert.Nil(err)
+
+	// load the access data for accessData
+	retAccessData, err := sqlStore.LoadAccess("testaccesstoken3")
+	compareAccessData("testaccesstoken3", retAccessData, assert)
+
+	// Test that foreign keys are not loaded for the previous access data
+	assert.Nil(retAccessData.AccessData.AccessData)
+	assert.Nil(retAccessData.AccessData.Client)
+	assert.Nil(retAccessData.AccessData.AuthorizeData)
+
+	// Test other fields
+	assert.Equal(retAccessData.AccessData.AccessToken, "testaccesstoken2")
+	assert.Equal(retAccessData.AccessData.RefreshToken, "testrefresh")
+	assert.Equal(retAccessData.AccessData.ExpiresIn, int32(100))
+	assert.Equal(retAccessData.AccessData.Scope, "testscope")
+	assert.Equal(retAccessData.AccessData.RedirectUri, "testredirect")
+	if !retAccessData.AccessData.CreatedAt.Equal(time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)) {
 		assert.Error(errors.New("The created_at dates are not equal"))
 	}
 
 	err = sqlStore.RemoveAuthorize("testcode")
 	assert.Nil(err)
-}
-
-func TestAccessNonEmptyPrevToken(t *testing.T) {
-	// TODO: implement this
+	err = sqlStore.RemoveAccess("testaccesstoken1")
+	assert.Nil(err)
+	err = sqlStore.RemoveAccess("testaccesstoken2")
+	assert.Nil(err)
+	err = sqlStore.RemoveAccess("testaccesstoken3")
+	assert.Nil(err)
 }
 
 // TestRefresh tests loading and removing access data from the refresh token
