@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/RangelReale/osin"
+	_ "github.com/stretchr/testify/assert"
 	"time"
 )
 
@@ -47,7 +48,7 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 		clientID    string
 		secret      string
 		redirectURI string
-		userID      int
+		userID      string
 	)
 
 	rows, err := store.authDB.Query("SELECT * FROM clients WHERE id = ?", id)
@@ -143,17 +144,25 @@ func (store *SQLStorage) RemoveAuthorize(code string) error {
 
 func (store *SQLStorage) SaveAccess(accessData *osin.AccessData) error {
 	stmt, err := store.authDB.Prepare(`
-		INSERT INTO access_data(authorize_data_code, prev_access_data_token, access_token, refresh_token,
-		expires_in, scope, redirect_uri, created_at)
-		VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO access_data(access_token, refresh_token,
+		expires_in, scope, redirect_uri, created_at, authorize_data_code, prev_access_data_token, client_id)
+		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(accessData.AuthorizeData.Code, accessData.AccessData.AccessToken,
-		accessData.AccessToken, accessData.RefreshToken, accessData.ExpiresIn, accessData.Scope,
-		accessData.RedirectUri, accessData.CreatedAt)
+	prevAccessDataToken := ""
+	if accessData.AccessData != nil {
+		prevAccessDataToken = accessData.AccessData.AccessToken
+	}
+
+	authDataCode := ""
+	if accessData.AuthorizeData != nil {
+		authDataCode = accessData.AuthorizeData.Code
+	}
+	_, err = stmt.Exec(accessData.AccessToken, accessData.RefreshToken, accessData.ExpiresIn, accessData.Scope,
+		accessData.RedirectUri, accessData.CreatedAt, authDataCode, prevAccessDataToken, accessData.Client.GetId())
 	return err
 }
 
@@ -206,10 +215,13 @@ func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.Acce
 
 func (store *SQLStorage) LoadAccess(token string) (*osin.AccessData, error) {
 	accessData, authDataCode, prevAccessDataToken, clientID, err := store.loadAccess(token)
-	// load previous access data
-	prevAccessData, _, _, _, err := store.loadAccess(prevAccessDataToken)
-	if err != nil {
-		return nil, err
+	// load previous access data if the token is not empty
+	var prevAccessData *osin.AccessData
+	if prevAccessDataToken != "" {
+		prevAccessData, _, _, _, err = store.loadAccess(prevAccessDataToken)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// laod client data
 	client, err := store.GetClient(clientID)
