@@ -266,5 +266,30 @@ func TestAccessNonEmptyPrevToken(t *testing.T) {
 
 // TestRefresh tests loading and removing access data from the refresh token
 func TestRefresh(t *testing.T) {
-	// TODO: implement this
+	assert := assert.New(t)
+
+	authData := setupAuthData(assert)
+
+	accessData := &osin.AccessData{
+		Client:        client,
+		AuthorizeData: authData,
+		AccessToken:   "testaccesstoken",
+		RefreshToken:  "testrefresh",
+		ExpiresIn:     100,
+		Scope:         "testscope",
+		RedirectUri:   "testredirect",
+		CreatedAt:     time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local),
+	}
+
+	sqlStore.SaveAccess(accessData)
+
+	retAccessData, err := sqlStore.LoadRefresh("testrefresh")
+	assert.Nil(err)
+
+	compareAccessData("testaccesstoken", retAccessData, assert)
+
+	err = sqlStore.RemoveAuthorize("testcode")
+	assert.Nil(err)
+	err = sqlStore.RemoveRefresh("testrefresh")
+	assert.Nil(err)
 }
