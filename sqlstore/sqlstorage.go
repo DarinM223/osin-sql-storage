@@ -41,6 +41,13 @@ func NewSQLStorage(authDB *sql.DB) *SQLStorage {
 	}
 }
 
+func (store *SQLStorage) Clone() osin.Storage {
+	return store
+}
+
+func (store *SQLStorage) Close() {
+}
+
 func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 	var (
 		clientID    string
