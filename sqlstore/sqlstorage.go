@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"errors"
 	"github.com/RangelReale/osin"
 	_ "github.com/stretchr/testify/assert"
 	"time"
@@ -10,12 +9,11 @@ import (
 
 // The database that stores the oauth2 data has to have the following schema:
 // clients:
-//   id           string
+//   id           string (primary key)
 //   secret       string
 //   redirect_uri string
-//   user_id      string
 // authorize_data:
-//   code         string
+//   code         string (primary key)
 //   expires_in   int32
 //   scope        string
 //   redirect_uri string
@@ -23,8 +21,8 @@ import (
 //   created_at   time.Time
 //   client_id    string (foreign key)
 // access_data:
-//   access_token           string
-//   refresh_token          string
+//   access_token           string (primary key)
+//   refresh_token          string (unique)
 //   expires_in	            int32
 //   scope                  string
 //   redirect_uri           string
@@ -48,30 +46,37 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 		clientID    string
 		secret      string
 		redirectURI string
-		userID      string
 	)
 
-	rows, err := store.authDB.Query("SELECT * FROM clients WHERE id = ?", id)
+	row := store.authDB.QueryRow("SELECT * FROM clients WHERE id = ?", id)
+
+	err := row.Scan(&clientID, &secret, &redirectURI)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		err := rows.Scan(&clientID, &secret, &redirectURI, &userID)
-		if err != nil {
-			return nil, err
-		}
+	return &osin.DefaultClient{
+		Id:          clientID,
+		Secret:      secret,
+		RedirectUri: redirectURI,
+	}, nil
+}
 
-		return &osin.DefaultClient{
-			Id:          clientID,
-			Secret:      secret,
-			RedirectUri: redirectURI,
-			UserData:    userID,
-		}, nil
+func (store *SQLStorage) SetClient(client osin.Client) error {
+	stmt, err := store.authDB.Prepare("INSERT INTO clients(id, secret, redirect_uri) VALUES(?, ?, ?)")
+
+	_, err = stmt.Exec(client.GetId(), client.GetSecret(), client.GetRedirectUri())
+	return err
+}
+
+func (store *SQLStorage) RemoveClient(id string) error {
+	stmt, err := store.authDB.Prepare("DELETE FROM clients WHERE id = ?")
+	if err != nil {
+		return err
 	}
 
-	return nil, errors.New("There are no clients with that client id")
+	_, err = stmt.Exec(id)
+	return err
 }
 
 func (store *SQLStorage) SaveAuthorize(authorizeData *osin.AuthorizeData) error {
@@ -99,18 +104,11 @@ func (store *SQLStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 		clientID    string
 	)
 
-	rows, err := store.authDB.Query("SELECT * FROM authorize_data WHERE code = ?", code)
+	row := store.authDB.QueryRow("SELECT * FROM authorize_data WHERE code = ?", code)
+
+	err := row.Scan(&authCode, &expiresIn, &scope, &redirectURI, &state, &createdAt, &clientID)
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		err := rows.Scan(&authCode, &expiresIn, &scope, &redirectURI, &state, &createdAt, &clientID)
-		if err != nil {
-			return nil, err
-		}
-		break
 	}
 
 	// Retrieve the client from the client id
@@ -188,14 +186,10 @@ func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.Acce
 	} else {
 		rows, err = store.authDB.Query("SELECT * FROM access_data WHERE access_token = ?", token)
 	}
-
-	if err != nil {
-		return nil, "", "", "", err
-	}
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&accessToken, &refreshToken,
+		err = rows.Scan(&accessToken, &refreshToken,
 			&expiresIn, &scope, &redirectURI, &createdAt, &authorizeDataCode, &prevAccessDataToken, &clientID)
 		if err != nil {
 			return nil, "", "", "", err

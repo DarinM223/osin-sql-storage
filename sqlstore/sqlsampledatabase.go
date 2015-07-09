@@ -2,11 +2,15 @@ package sqlstore
 
 import "time"
 
+/*
+ * Contains sample database models for the gorm orm
+ * that match the tables needed for SQLStorage
+ */
+
 type Client struct {
 	ID          string `gorm:"primary_key"`
 	Secret      string
 	RedirectUri string
-	UserID      string
 }
 
 func (c Client) TableName() string {

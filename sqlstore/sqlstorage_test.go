@@ -37,17 +37,9 @@ func setupDB() {
 		Id:          "testclient",
 		Secret:      "testsecret",
 		RedirectUri: "testredirect",
-		UserData:    "testuserid",
 	}
 
-	dbClient := &Client{
-		ID:          client.GetId(),
-		Secret:      client.GetSecret(),
-		RedirectUri: client.GetRedirectUri(),
-		UserID:      client.GetUserData().(string),
-	}
-
-	db.Create(dbClient)
+	sqlStore.SetClient(client)
 }
 
 // teardownDB closes the database and removes the database file
@@ -90,6 +82,32 @@ func setupAuthData(assert *assert.Assertions) *osin.AuthorizeData {
 	return authData
 }
 
+// TestClient tests saving, loading, and removing client data
+func TestClient(t *testing.T) {
+	assert := assert.New(t)
+
+	testClient := &osin.DefaultClient{
+		Id:          "test",
+		Secret:      "secret",
+		RedirectUri: "redirect",
+	}
+
+	sqlStore.SetClient(testClient)
+
+	retClient, err := sqlStore.GetClient("test")
+	assert.Nil(err)
+
+	assert.Equal(retClient.GetId(), "test")
+	assert.Equal(retClient.GetSecret(), "secret")
+	assert.Equal(retClient.GetRedirectUri(), "redirect")
+	assert.Nil(retClient.GetUserData())
+
+	sqlStore.RemoveClient("test")
+
+	_, err = sqlStore.GetClient("test")
+	assert.NotNil(err)
+}
+
 // TestAuthorize tests saving, loading, and removing authorization data
 func TestAuthorize(t *testing.T) {
 	assert := assert.New(t)
@@ -103,7 +121,6 @@ func TestAuthorize(t *testing.T) {
 	assert.Equal(retAuthData.Client.GetId(), "testclient")
 	assert.Equal(retAuthData.Client.GetSecret(), "testsecret")
 	assert.Equal(retAuthData.Client.GetRedirectUri(), "testredirect")
-	assert.Equal(retAuthData.Client.GetUserData().(string), "testuserid")
 
 	// test other fields
 	assert.Equal(retAuthData.Code, "testcode")
@@ -126,7 +143,6 @@ func compareAccessData(accessToken string, retAccessData *osin.AccessData, asser
 	assert.Equal(retAccessData.Client.GetId(), "testclient")
 	assert.Equal(retAccessData.Client.GetSecret(), "testsecret")
 	assert.Equal(retAccessData.Client.GetRedirectUri(), "testredirect")
-	assert.Equal(retAccessData.Client.GetUserData().(string), "testuserid")
 
 	// test if auth data is properly loaded
 	assert.Equal(retAccessData.AuthorizeData.Code, "testcode")
@@ -281,7 +297,8 @@ func TestRefresh(t *testing.T) {
 		CreatedAt:     time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local),
 	}
 
-	sqlStore.SaveAccess(accessData)
+	err := sqlStore.SaveAccess(accessData)
+	assert.Nil(err)
 
 	retAccessData, err := sqlStore.LoadRefresh("testrefresh")
 	assert.Nil(err)
