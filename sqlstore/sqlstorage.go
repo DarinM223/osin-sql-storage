@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 	"github.com/RangelReale/osin"
+	_ "github.com/jinzhu/gorm"
 	_ "github.com/stretchr/testify/assert"
 	"time"
 )
@@ -250,10 +251,13 @@ func (store *SQLStorage) RemoveAccess(token string) error {
 
 func (store *SQLStorage) LoadRefresh(token string) (*osin.AccessData, error) {
 	accessData, authDataCode, prevAccessDataToken, clientID, err := store.loadAccess(token, true)
-	// load previous access data
-	prevAccessData, _, _, _, err := store.loadAccess(prevAccessDataToken)
-	if err != nil {
-		return nil, err
+	// load previous access data if the token is not empty
+	var prevAccessData *osin.AccessData
+	if prevAccessDataToken != "" {
+		prevAccessData, _, _, _, err = store.loadAccess(prevAccessDataToken)
+		if err != nil {
+			return nil, err
+		}
 	}
 	// laod client data
 	client, err := store.GetClient(clientID)
