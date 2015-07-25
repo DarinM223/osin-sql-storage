@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"fmt"
+	"github.com/DarinM223/osin-sql-storage/sqlstore/gorm_schema"
 	"github.com/RangelReale/osin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
@@ -26,9 +27,9 @@ func setupDB() {
 
 	// create tables
 	// db.LogMode(true)
-	db.AutoMigrate(&Client{}, &AuthorizeData{}, &AccessData{})
-	db.Model(&AccessData{}).AddForeignKey("authorize_data_code", "authorize_data", "CASCADE", "RESTRICT")
-	db.Model(&AccessData{}).AddForeignKey("prev_access_data_token", "access_data", "CASCADE", "RESTRICT")
+	db.AutoMigrate(&gorm_schema.Client{}, &gorm_schema.AuthorizeData{}, &gorm_schema.AccessData{})
+	db.Model(&gorm_schema.AccessData{}).AddForeignKey("authorize_data_code", "authorize_data", "CASCADE", "RESTRICT")
+	db.Model(&gorm_schema.AccessData{}).AddForeignKey("prev_access_data_token", "access_data", "CASCADE", "RESTRICT")
 
 	testingContext.DB = db
 	testingContext.Store = NewSQLStorage(db.DB())

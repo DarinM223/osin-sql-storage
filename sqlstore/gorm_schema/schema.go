@@ -1,4 +1,4 @@
-package sqlstore
+package gorm_schema
 
 import "time"
 

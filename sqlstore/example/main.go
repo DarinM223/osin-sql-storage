@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"github.com/DarinM223/osin-sql-storage/sqlstore"
+	"github.com/DarinM223/osin-sql-storage/sqlstore/gorm_schema"
 	"github.com/RangelReale/osin"
 	"github.com/RangelReale/osin/example"
 	"github.com/RangelReale/osincli"
@@ -29,9 +30,9 @@ func main() {
 	}
 	defer db.Close()
 
-	db.AutoMigrate(&sqlstore.Client{}, &sqlstore.AuthorizeData{}, &sqlstore.AccessData{})
-	db.Model(&sqlstore.AccessData{}).AddForeignKey("authorize_data_code", "authorize_data", "CASCADE", "RESTRICT")
-	db.Model(&sqlstore.AccessData{}).AddForeignKey("prev_access_data_token", "access_data", "CASCADE", "RESTRICT")
+	db.AutoMigrate(&gorm_schema.Client{}, &gorm_schema.AuthorizeData{}, &gorm_schema.AccessData{})
+	db.Model(&gorm_schema.AccessData{}).AddForeignKey("authorize_data_code", "authorize_data", "CASCADE", "RESTRICT")
+	db.Model(&gorm_schema.AccessData{}).AddForeignKey("prev_access_data_token", "access_data", "CASCADE", "RESTRICT")
 
 	sstorage := sqlstore.NewSQLStorage(db.DB())
 

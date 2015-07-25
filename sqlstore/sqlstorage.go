@@ -8,29 +8,33 @@ import (
 	"time"
 )
 
-// The database that stores the oauth2 data has to have the following schema:
-// clients:
-//   id           string (primary key)
-//   secret       string
-//   redirect_uri string
-// authorize_data:
-//   code         string (primary key)
-//   expires_in   int32
-//   scope        string
-//   redirect_uri string
-//   state        string
-//   created_at   time.Time
-//   client_id    string (foreign key)
-// access_data:
-//   access_token           string (primary key)
-//   refresh_token          string (unique)
-//   expires_in	            int32
-//   scope                  string
-//   redirect_uri           string
-//   created_at	            time.Time
-//   authorize_data_code    string (foreign key)
-//   prev_access_data_token string (foreign key)
-//   client_id              string (foreign key)
+/*
+ * The database that stores the oauth2 data has to have the following schema:
+ * clients:
+ * id           string (primary key)
+ * secret       string
+ * redirect_uri string
+ *
+ * authorize_data:
+ * code         string (primary key)
+ * expires_in   int32
+ * scope        string
+ * redirect_uri string
+ * state        string
+ * created_at   time.Time
+ * client_id    string (foreign key)
+ *
+ * access_data:
+ * access_token           string (primary key)
+ * refresh_token          string (unique)
+ * expires_in             int32
+ * scope                  string
+ * redirect_uri           string
+ * created_at             time.Time
+ * authorize_data_code    string (foreign key)
+ * prev_access_data_token string (foreign key)
+ * client_id              string (foreign key)
+ */
 
 type SQLStorage struct {
 	authDB *sql.DB
@@ -225,7 +229,7 @@ func (store *SQLStorage) LoadAccess(token string) (*osin.AccessData, error) {
 			return nil, err
 		}
 	}
-	// laod client data
+	// load client data
 	client, err := store.GetClient(clientID)
 	if err != nil {
 		return nil, err
@@ -259,7 +263,7 @@ func (store *SQLStorage) LoadRefresh(token string) (*osin.AccessData, error) {
 			return nil, err
 		}
 	}
-	// laod client data
+	// load client data
 	client, err := store.GetClient(clientID)
 	if err != nil {
 		return nil, err
