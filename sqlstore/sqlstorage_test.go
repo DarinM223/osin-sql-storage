@@ -212,7 +212,7 @@ func testAccessDataRecursive(t *testing.T, client osin.Client, authData *osin.Au
 	accessTests := []*osin.AccessData{}
 
 	// store the previous access data so you can create a linked list
-	var prevAccessData *osin.AccessData = nil
+	var prevAccessData *osin.AccessData
 
 	// copy access data tests and set the client and auth data
 	for _, accessData := range accessDataTests {
@@ -276,6 +276,73 @@ func testAccessDataRecursive(t *testing.T, client osin.Client, authData *osin.Au
 		if err != nil {
 			t.Error(err)
 		}
+	}
+}
+
+// BenchmarkClient benchmarks saving, loading, and removing client data records
+func BenchmarkClient(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		err := testingContext.Store.SetClient(clientTests[0])
+		if err != nil {
+			b.Error(err)
+		}
+
+		_, err = testingContext.Store.GetClient(clientTests[0].GetId())
+		if err != nil {
+			b.Error(err)
+		}
+
+		testingContext.Store.RemoveClient(clientTests[0].GetId())
+	}
+}
+
+// BenchmarkAuthorize benchmarks saving, loading, and removing authorize data records
+func BenchmarkAuthorize(b *testing.B) {
+	testingContext.Store.SetClient(clientTests[0])
+
+	authDataCopy := authDataTests[0]
+	authDataCopy.Client = clientTests[0]
+
+	for n := 0; n < b.N; n++ {
+		err := testingContext.Store.SaveAuthorize(&authDataCopy)
+		if err != nil {
+			b.Error(err)
+		}
+
+		_, err = testingContext.Store.LoadAuthorize(authDataCopy.Code)
+		if err != nil {
+			b.Error(err)
+		}
+
+		testingContext.Store.RemoveAuthorize(authDataCopy.Code)
+	}
+
+	testingContext.Store.RemoveClient(clientTests[0].GetId())
+}
+
+// BenchmarkAccess benchmarks saving, loading, and removing access data records
+func BenchmarkAccess(b *testing.B) {
+	testingContext.Store.SetClient(clientTests[0])
+	authData := authDataTests[0]
+	authData.Client = clientTests[0]
+	testingContext.Store.SaveAuthorize(&authData)
+
+	accessDataCopy := accessDataTests[0]
+	accessDataCopy.AuthorizeData = &authData
+	accessDataCopy.Client = clientTests[0]
+
+	for n := 0; n < b.N; n++ {
+		err := testingContext.Store.SaveAccess(&accessDataCopy)
+		if err != nil {
+			b.Error(err)
+		}
+
+		_, err = testingContext.Store.LoadAccess(accessDataCopy.AccessToken)
+		if err != nil {
+			b.Error(err)
+		}
+
+		testingContext.Store.RemoveAccess(accessDataCopy.AccessToken)
 	}
 }
 

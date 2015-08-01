@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pprof listing</title>
+<style type="text/css">
+body {
+font-family: sans-serif;
+}
+h1 {
+  font-size: 1.5em;
+  margin-bottom: 4px;
+}
+.legend {
+  font-size: 1.25em;
+}
+.line {
+color: #aaaaaa;
+}
+.nop {
+color: #aaaaaa;
+}
+.unimportant {
+color: #cccccc;
+}
+.disasmloc {
+color: #000000;
+}
+.deadsrc {
+cursor: pointer;
+}
+.deadsrc:hover {
+background-color: #eeeeee;
+}
+.livesrc {
+color: #0000ff;
+cursor: pointer;
+}
+.livesrc:hover {
+background-color: #eeeeee;
+}
+.asm {
+color: #008800;
+display: none;
+}
+</style>
+<script type="text/javascript">
+function pprof_toggle_asm(e) {
+  var target;
+  if (!e) e = window.event;
+  if (e.target) target = e.target;
+  else if (e.srcElement) target = e.srcElement;
+
+  if (target) {
+    var asm = target.nextSibling;
+    if (asm && asm.className == "asm") {
+      asm.style.display = (asm.style.display == "block" ? "" : "block");
+      e.preventDefault();
+      return false;
+    }
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="legend">File: sqlstore.test<br>
+Type: cpu<br>Total: 3.74s</div><h1>github.com/DarinM223/osin-sql-storage/sqlstore.(*SQLStorage).GetClient</h1>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go
+<pre onClick="pprof_toggle_asm()">
+  Total:           0      400ms (flat, cum) 10.70%
+<span class=line>     51</span> <span class=nop>           .          . } </span>
+<span class=line>     52</span> <span class=nop>           .          .  </span>
+<span class=line>     53</span> <span class=nop>           .          . func (store *SQLStorage) Close() { </span>
+<span class=line>     54</span> <span class=nop>           .          . } </span>
+<span class=line>     55</span> <span class=nop>           .          .  </span>
+<span class=line>     56</span> <span class=deadsrc>           .          . func (store *SQLStorage) GetClient(id string) (osin.Client, error) { </span><span class=asm>                   .          .  413aa90: GS MOVQ GS:0x8a0, CX                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aa99: LEAQ -0x78(SP), AX                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aa9e: CMPQ 0x10(CX), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aaa2: JA 0x413aaab                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aaa4: CALL runtime.morestack_noctxt(SB)                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aaa9: JMP github.com/DarinM223/osin-sql-storage/sqlstore.(*SQLStorage).GetClient(SB) <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aaab: SUBQ $ +8(SB), SP                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aab2: MOVQ $0x0, 0x118(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aabe: MOVQ $0x0, 0x120(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aaca: MOVQ $0x0, 0x128(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+                   .          .  413aad6: MOVQ $0x0, 0x130(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:56</span>
+</span>
+<span class=line>     57</span> <span class=nop>           .          . 	var ( </span>
+<span class=line>     58</span> <span class=deadsrc>           .          . 		clientID    string </span><span class=asm>                   .          .  413aae2: LEAQ 0x263f37(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:58</span>
+                   .          .  413aae9: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:58</span>
+                   .          .  413aaed: CALL runtime.newobject(SB)                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:58</span>
+                   .          .  413aaf2: MOVQ 0x8(SP), BX                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:58</span>
+                   .          .  413aaf7: MOVQ BX, 0x68(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:58</span>
+</span>
+<span class=line>     59</span> <span class=deadsrc>           .          . 		secret      string </span><span class=asm>                   .          .  413aafc: LEAQ 0x263f1d(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:59</span>
+                   .          .  413ab03: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:59</span>
+                   .          .  413ab07: CALL runtime.newobject(SB)                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:59</span>
+                   .          .  413ab0c: MOVQ 0x8(SP), BX                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:59</span>
+                   .          .  413ab11: MOVQ BX, 0x58(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:59</span>
+</span>
+<span class=line>     60</span> <span class=deadsrc>           .          . 		redirectURI string </span><span class=asm>                   .          .  413ab16: LEAQ 0x263f03(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:60</span>
+                   .          .  413ab1d: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:60</span>
+                   .          .  413ab21: CALL runtime.newobject(SB)                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:60</span>
+                   .          .  413ab26: MOVQ 0x8(SP), BX                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:60</span>
+                   .          .  413ab2b: MOVQ BX, 0x60(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:60</span>
+</span>
+<span class=line>     61</span> <span class=nop>           .          . 	) </span>
+<span class=line>     62</span> <span class=nop>           .          .  </span>
+<span class=line>     63</span> <span class=deadsrc>           .       60ms 	row := store.authDB.QueryRow(&#34;SELECT * FROM clients WHERE id = ?&#34;, id) </span><span class=asm>                   .          .  413ab30: MOVQ 0x108(SP), BX                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab38: MOVQ BX, 0x90(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab40: MOVQ 0x110(SP), BX                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab48: MOVQ BX, 0x98(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab50: LEAQ 0xa0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab58: MOVQ $0x0, 0(BX)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab5f: MOVQ $0x0, 0x8(BX)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab67: LEAQ 0xa0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab6f: CMPQ $0x0, BX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab73: JE 0x413af27                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab79: MOVQ $0x1, DX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab80: MOVQ $0x1, CX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab87: MOVQ BX, 0xb0(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab8f: MOVQ DX, 0xb8(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab97: MOVQ CX, 0xc0(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ab9f: LEAQ 0x263e7a(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413aba6: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abaa: LEAQ 0x90(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abb2: MOVQ BX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abb7: CALL runtime.convT2E(SB)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abbc: MOVQ 0x10(SP), CX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abc1: MOVQ 0x18(SP), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abc6: MOVQ 0xb0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abce: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abd2: MOVQ CX, 0x80(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abda: MOVQ CX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abdf: MOVQ AX, 0x88(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abe7: MOVQ AX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abec: CALL runtime.writebarrieriface(SB)               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abf1: MOVQ 0x100(SP), SI                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abf9: MOVQ 0(SI), DI                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413abfc: MOVQ DI, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac00: LEAQ 0x3bda59(IP), SI                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac07: LEAQ 0x8(SP), DI                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac0c: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac0e: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac10: MOVQ 0xb0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac18: MOVQ BX, 0x18(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac1d: MOVQ 0xb8(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac25: MOVQ BX, 0x20(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac2a: MOVQ 0xc0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac32: MOVQ BX, 0x28(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .       60ms  413ac37: CALL database/sql.(*DB).QueryRow(SB)             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac3c: MOVQ 0x30(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413ac41: MOVQ BX, 0x38(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413af27: MOVL AX, 0(BX)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413af29: JMP 0x413ab79                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+                   .          .  413af2e: ?                                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:63</span>
+</span>
+<span class=line>     64</span> <span class=nop>           .          .  </span>
+<span class=line>     65</span> <span class=deadsrc>           .      340ms 	err := row.Scan(&amp;clientID, &amp;secret, &amp;redirectURI) </span><span class=asm>                   .          .  413ac46: MOVQ 0x68(SP), CX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac4b: MOVQ 0x58(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac50: MOVQ BX, 0x50(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac55: MOVQ 0x60(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac5a: MOVQ BX, 0x48(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac5f: LEAQ 0xc8(SP), DI                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac67: XORL AX, AX                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac69: CALL 0x411f124                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac6e: LEAQ 0xc8(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac76: CMPQ $0x0, BX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac7a: JE 0x413af20                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac80: MOVQ $0x3, DX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac87: MOVQ $0x3, BP                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac8e: MOVQ DX, 0xb8(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac96: MOVQ BP, 0xc0(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ac9e: MOVQ BX, 0xb0(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413aca6: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acaa: MOVQ CX, AX                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acad: LEAQ 0x24fa4c(IP), CX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acb4: MOVQ CX, 0x80(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acbc: MOVQ CX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acc1: MOVQ AX, 0x88(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acc9: MOVQ AX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acce: CALL runtime.writebarrieriface(SB)               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acd3: MOVQ 0xb0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acdb: ADDQ $0x10, BX                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acdf: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ace3: MOVQ 0x50(SP), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ace8: LEAQ 0x24fa11(IP), CX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acef: MOVQ CX, 0x80(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acf7: MOVQ CX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413acfc: MOVQ AX, 0x88(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad04: MOVQ AX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad09: CALL runtime.writebarrieriface(SB)               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad0e: MOVQ 0xb0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad16: ADDQ $ (SB), BX                                  <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad1a: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad1e: MOVQ 0x48(SP), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad23: LEAQ 0x24f9d6(IP), CX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad2a: MOVQ CX, 0x80(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad32: MOVQ CX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad37: MOVQ AX, 0x88(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad3f: MOVQ AX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad44: CALL runtime.writebarrieriface(SB)               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad49: MOVQ 0x38(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad4e: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad52: MOVQ 0xb0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad5a: MOVQ BX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad5f: MOVQ 0xb8(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad67: MOVQ BX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad6c: MOVQ 0xc0(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad74: MOVQ BX, 0x18(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .      340ms  413ad79: CALL database/sql.(*Row).Scan(SB)                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad7e: MOVQ 0x20(SP), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad83: MOVQ 0x28(SP), CX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413ad88: MOVQ CX, 0x78(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413af20: MOVL AX, 0(BX)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+                   .          .  413af22: JMP 0x413ac80                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:65</span>
+</span>
+<span class=line>     66</span> <span class=deadsrc>           .          . 	if err != nil { </span><span class=asm>                   .          .  413ad8d: CMPQ $0x0, AX                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:66</span>
+                   .          .  413ad91: MOVQ AX, 0x70(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:66</span>
+                   .          .  413ad96: JE 0x413adc8                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:66</span>
+</span>
+<span class=line>     67</span> <span class=deadsrc>           .          . 		return nil, err </span><span class=asm>                   .          .  413ad98: MOVQ $0x0, 0x118(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+                   .          .  413ada4: MOVQ $0x0, 0x120(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+                   .          .  413adb0: MOVQ AX, 0x128(SP)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+                   .          .  413adb8: MOVQ CX, 0x130(SP)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+                   .          .  413adc0: ADDQ $ +8(SB), SP                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+                   .          .  413adc7: RET                                              <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:67</span>
+</span>
+<span class=line>     68</span> <span class=nop>           .          . 	} </span>
+<span class=line>     69</span> <span class=nop>           .          .  </span>
+<span class=line>     70</span> <span class=nop>           .          . 	return &amp;osin.DefaultClient{ </span>
+<span class=line>     71</span> <span class=nop>           .          . 		Id:          clientID, </span>
+<span class=line>     72</span> <span class=nop>           .          . 		Secret:      secret, </span>
+<span class=line>     73</span> <span class=deadsrc>           .          . 		RedirectUri: redirectURI, </span><span class=asm>                   .          .  413adc8: LEAQ 0x314d71(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adcf: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413add3: CALL runtime.newobject(SB)                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413add8: MOVQ 0x8(SP), DI                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413addd: MOVQ DI, CX                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ade0: CMPQ $0x0, DI                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ade4: JE 0x413af19                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adea: XORL AX, AX                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adec: CALL 0x411f120                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adf1: MOVQ CX, 0x40(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adf6: MOVQ CX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adfa: CMPQ $0x0, 0(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413adff: JE 0x413af0d                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae05: MOVQ 0x68(SP), SI                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae0a: LEAQ 0x8(SP), BP                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae0f: MOVQ BP, DI                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae12: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae14: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae16: CALL runtime.writebarrierstring(SB)              <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae1b: MOVQ 0x40(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae20: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae24: CMPQ $0x0, 0(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae29: JE 0x413af01                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae2f: ADDQ $0x10, 0(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae34: MOVQ 0x58(SP), SI                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae39: LEAQ 0x8(SP), BP                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae3e: MOVQ BP, DI                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae41: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae43: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae45: CALL runtime.writebarrierstring(SB)              <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae4a: MOVQ 0x40(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae4f: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae53: CMPQ $0x0, 0(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae58: JE 0x413aef5                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae5e: ADDQ $ (SB), 0(SP)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae63: MOVQ 0x60(SP), SI                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae68: LEAQ 0x8(SP), BP                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae6d: MOVQ BP, DI                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae70: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae72: MOVSQ DS:0(SI), ES:0(DI)                         <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae74: CALL runtime.writebarrierstring(SB)              <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae79: MOVQ 0x40(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae7e: MOVQ BX, 0x40(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae83: MOVQ 0x533c5e(IP), AX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae8a: XORL BP, BP                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae8c: CMPQ BP, AX                                      <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413ae8f: JE 0x413aec6                                     <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aec6: LEAQ 0x3205b3(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aecd: MOVQ BX, 0(SP)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aed1: LEAQ 0x305c68(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aed8: MOVQ BX, 0x8(SP)                                 <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aedd: LEAQ 0x533c04(IP), BX                            <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aee4: MOVQ BX, 0x10(SP)                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aee9: CALL runtime.typ2Itab(SB)                        <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aeee: MOVQ 0x18(SP), AX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aef5: MOVL AX, 0                                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413aefc: JMP 0x413ae5e                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af01: MOVL AX, 0                                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af08: JMP 0x413ae2f                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af0d: MOVL AX, 0                                       <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af14: JMP 0x413ae05                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af19: MOVL AX, 0(DI)                                   <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+                   .          .  413af1b: JMP 0x413adea                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:73</span>
+</span>
+<span class=line>     74</span> <span class=deadsrc>           .          . 	}, nil </span><span class=asm>                   .          .  413ae91: MOVQ 0x40(SP), BX                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413ae96: MOVQ BX, 0x120(SP)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413ae9e: MOVQ AX, 0x118(SP)                               <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413aea6: MOVQ $0x0, 0x128(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413aeb2: MOVQ $0x0, 0x130(SP)                             <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413aebe: ADDQ $ +8(SB), SP                                <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413aec5: RET                                              <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+                   .          .  413aef3: JMP 0x413ae91                                    <span class=disasmloc>/Users/darin/go/src/github.com/DarinM223/osin-sql-storage/sqlstore/sqlstorage.go:74</span>
+</span>
+<span class=line>     75</span> <span class=nop>           .          . } </span>
+<span class=line>     76</span> <span class=nop>           .          .  </span>
+<span class=line>     77</span> <span class=nop>           .          . func (store *SQLStorage) SetClient(client osin.Client) error { </span>
+<span class=line>     78</span> <span class=nop>           .          . 	stmt, err := store.authDB.Prepare(&#34;INSERT INTO clients(id, secret, redirect_uri) VALUES(?, ?, ?)&#34;) </span>
+<span class=line>     79</span> <span class=nop>           .          .  </span>
+</pre>
+
+</body>
+</html>
+
