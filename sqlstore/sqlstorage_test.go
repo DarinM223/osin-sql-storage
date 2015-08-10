@@ -60,25 +60,34 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
+var userData = []interface{}{
+	map[string]interface{}{"Username": "user1", "Password": "pass1"},
+	map[string]interface{}{"Username": "user2", "Password": "pass2"},
+	map[string]interface{}{"Username": "user3", "Password": "pass3"},
+}
+
 // List of input tests for Client
 var clientTests = []*osin.DefaultClient{
-	&osin.DefaultClient{Id: "test", Secret: "secret", RedirectUri: "redirect"},
+	&osin.DefaultClient{Id: "test", Secret: "secret", RedirectUri: "redirect", UserData: userData[0]},
 }
 
 // List of input tests for AuthorizeData
 var authDataTests = []osin.AuthorizeData{
 	osin.AuthorizeData{Code: "testcode", ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
-		State: "teststate", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)},
+		State: "teststate", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[0]},
 }
 
 // List of input tests for AccessData
 var accessDataTests = []osin.AccessData{
-	osin.AccessData{AccessToken: "testaccesstoken1", RefreshToken: "testrefresh", ExpiresIn: 100,
-		Scope: "testscope", RedirectUri: "testredirect", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)},
-	osin.AccessData{AccessToken: "testaccesstoken2", RefreshToken: "testrefresh2", ExpiresIn: 100,
-		Scope: "testscope", RedirectUri: "testredirect", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)},
-	osin.AccessData{AccessToken: "testaccesstoken3", RefreshToken: "testrefresh3", ExpiresIn: 100,
-		Scope: "testscope", RedirectUri: "testredirect", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local)},
+	osin.AccessData{AccessToken: "testaccesstoken1", RefreshToken: "testrefresh",
+		ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
+		CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[0]},
+	osin.AccessData{AccessToken: "testaccesstoken2", RefreshToken: "testrefresh2",
+		ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
+		CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[1]},
+	osin.AccessData{AccessToken: "testaccesstoken3", RefreshToken: "testrefresh3",
+		ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
+		CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[2]},
 }
 
 func TestRun(t *testing.T) {
@@ -377,6 +386,9 @@ func compareAuthData(authData1, authData2 *osin.AuthorizeData) bool {
 	if !reflect.DeepEqual(testAuthData1, testAuthData2) {
 		return false
 	}
+	if !reflect.DeepEqual(authData1.UserData, authData2.UserData) {
+		return false
+	}
 	return authData1.CreatedAt.Equal(authData2.CreatedAt)
 }
 
@@ -408,6 +420,9 @@ func compareAccessData(accessData1, accessData2 *osin.AccessData) bool {
 	}
 
 	if !reflect.DeepEqual(testAccessData1, testAccessData2) {
+		return false
+	}
+	if !reflect.DeepEqual(accessData1.UserData, accessData2.UserData) {
 		return false
 	}
 	return accessData1.CreatedAt.Equal(accessData2.CreatedAt)

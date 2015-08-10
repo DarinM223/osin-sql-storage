@@ -11,6 +11,7 @@ type Client struct {
 	ID          string `gorm:"primary_key"`
 	Secret      string
 	RedirectUri string
+	UserData    string
 }
 
 func (c Client) TableName() string {
@@ -24,6 +25,7 @@ type AuthorizeData struct {
 	RedirectUri string
 	State       string
 	CreatedAt   time.Time
+	UserData    string
 	ClientID    string `sql:"index"`
 }
 
@@ -38,6 +40,7 @@ type AccessData struct {
 	Scope               string
 	RedirectUri         string
 	CreatedAt           time.Time
+	UserData            string
 	AuthorizeDataCode   string `sql:"index"`
 	PrevAccessDataToken string `sql:"index"`
 	ClientID            string `sql:"index"`

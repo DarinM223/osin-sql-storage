@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/RangelReale/osin"
 	_ "github.com/jinzhu/gorm"
 	_ "github.com/stretchr/testify/assert"
@@ -14,6 +15,7 @@ import (
  * id           string (primary key)
  * secret       string
  * redirect_uri string
+ * user_data    string
  *
  * authorize_data:
  * code         string (primary key)
@@ -22,6 +24,7 @@ import (
  * redirect_uri string
  * state        string
  * created_at   time.Time
+ * user_data    string
  * client_id    string (foreign key)
  *
  * access_data:
@@ -31,6 +34,7 @@ import (
  * scope                  string
  * redirect_uri           string
  * created_at             time.Time
+ * user_data              string
  * authorize_data_code    string (foreign key)
  * prev_access_data_token string (foreign key)
  * client_id              string (foreign key)
@@ -53,16 +57,51 @@ func (store *SQLStorage) Clone() osin.Storage {
 func (store *SQLStorage) Close() {
 }
 
+func getUserData(userData string) (interface{}, error) {
+	_ = "breakpoint"
+	// Return nil if there is no user data
+	if userData == "" {
+		return nil, nil
+	}
+
+	var data interface{}
+
+	err := json.Unmarshal([]byte(userData), &data)
+	return data, err
+}
+
+func setUserData(userData interface{}) (string, error) {
+	// Return empty string if user data is nil
+	if userData == nil {
+		return "", nil
+	}
+
+	data, err := json.Marshal(userData)
+	if err != nil {
+		return "", err
+	}
+
+	userDataStr := string(data)
+	return userDataStr, err
+}
+
 func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 	var (
 		clientID    string
 		secret      string
 		redirectURI string
+		userDataStr string
 	)
 
 	row := store.authDB.QueryRow("SELECT * FROM clients WHERE id = ?", id)
 
-	err := row.Scan(&clientID, &secret, &redirectURI)
+	err := row.Scan(&clientID, &secret, &redirectURI, &userDataStr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal user data from string
+	userData, err := getUserData(userDataStr)
 	if err != nil {
 		return nil, err
 	}
@@ -71,13 +110,20 @@ func (store *SQLStorage) GetClient(id string) (osin.Client, error) {
 		Id:          clientID,
 		Secret:      secret,
 		RedirectUri: redirectURI,
+		UserData:    userData,
 	}, nil
 }
 
 func (store *SQLStorage) SetClient(client osin.Client) error {
-	stmt, err := store.authDB.Prepare("INSERT INTO clients(id, secret, redirect_uri) VALUES(?, ?, ?)")
+	stmt, err := store.authDB.Prepare("INSERT INTO clients(id, secret, redirect_uri, user_data) VALUES(?, ?, ?, ?)")
 
-	_, err = stmt.Exec(client.GetId(), client.GetSecret(), client.GetRedirectUri())
+	// Marshal user data into string
+	userDataStr, err := setUserData(client.GetUserData())
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(client.GetId(), client.GetSecret(), client.GetRedirectUri(), userDataStr)
 	return err
 }
 
@@ -93,15 +139,22 @@ func (store *SQLStorage) RemoveClient(id string) error {
 
 func (store *SQLStorage) SaveAuthorize(authorizeData *osin.AuthorizeData) error {
 	stmt, err := store.authDB.Prepare(`
-		INSERT INTO authorize_data(code, expires_in, scope, redirect_uri, state, created_at, client_id) 
-		VALUES (?, ?, ?, ?, ?, ?, ?)
+		INSERT INTO authorize_data(code, expires_in, scope, redirect_uri, state, created_at, user_data, client_id) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		`)
 	if err != nil {
 		return err
 	}
 
+	// Marshal user data into string
+	userDataStr, err := setUserData(authorizeData.UserData)
+	if err != nil {
+		return err
+	}
+
 	_, err = stmt.Exec(authorizeData.Code, authorizeData.ExpiresIn, authorizeData.Scope,
-		authorizeData.RedirectUri, authorizeData.State, authorizeData.CreatedAt, authorizeData.Client.GetId())
+		authorizeData.RedirectUri, authorizeData.State, authorizeData.CreatedAt,
+		userDataStr, authorizeData.Client.GetId())
 	return err
 }
 
@@ -113,12 +166,19 @@ func (store *SQLStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 		redirectURI string
 		state       string
 		createdAt   time.Time
+		userDataStr string
 		clientID    string
 	)
 
 	row := store.authDB.QueryRow("SELECT * FROM authorize_data WHERE code = ?", code)
 
-	err := row.Scan(&authCode, &expiresIn, &scope, &redirectURI, &state, &createdAt, &clientID)
+	err := row.Scan(&authCode, &expiresIn, &scope, &redirectURI, &state, &createdAt, &userDataStr, &clientID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the user data from string
+	userData, err := getUserData(userDataStr)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +196,7 @@ func (store *SQLStorage) LoadAuthorize(code string) (*osin.AuthorizeData, error)
 		RedirectUri: redirectURI,
 		State:       state,
 		CreatedAt:   createdAt,
+		UserData:    userData,
 		Client:      client,
 	}
 
@@ -155,9 +216,15 @@ func (store *SQLStorage) RemoveAuthorize(code string) error {
 func (store *SQLStorage) SaveAccess(accessData *osin.AccessData) error {
 	stmt, err := store.authDB.Prepare(`
 		INSERT INTO access_data(access_token, refresh_token,
-		expires_in, scope, redirect_uri, created_at, authorize_data_code, prev_access_data_token, client_id)
-		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+		expires_in, scope, redirect_uri, created_at, user_data, authorize_data_code, prev_access_data_token, client_id)
+		VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		`)
+	if err != nil {
+		return err
+	}
+
+	// Marshal user data into string
+	userDataStr, err := setUserData(accessData.UserData)
 	if err != nil {
 		return err
 	}
@@ -171,8 +238,10 @@ func (store *SQLStorage) SaveAccess(accessData *osin.AccessData) error {
 	if accessData.AuthorizeData != nil {
 		authDataCode = accessData.AuthorizeData.Code
 	}
-	_, err = stmt.Exec(accessData.AccessToken, accessData.RefreshToken, accessData.ExpiresIn, accessData.Scope,
-		accessData.RedirectUri, accessData.CreatedAt, authDataCode, prevAccessDataToken, accessData.Client.GetId())
+
+	_, err = stmt.Exec(accessData.AccessToken, accessData.RefreshToken, accessData.ExpiresIn,
+		accessData.Scope, accessData.RedirectUri, accessData.CreatedAt, userDataStr, authDataCode,
+		prevAccessDataToken, accessData.Client.GetId())
 	return err
 }
 
@@ -186,6 +255,7 @@ func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.Acce
 		scope               string
 		redirectURI         string
 		createdAt           time.Time
+		userDataStr         string
 		authorizeDataCode   string
 		prevAccessDataToken string
 		clientID            string
@@ -202,11 +272,18 @@ func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.Acce
 
 	for rows.Next() {
 		err = rows.Scan(&accessToken, &refreshToken,
-			&expiresIn, &scope, &redirectURI, &createdAt, &authorizeDataCode, &prevAccessDataToken, &clientID)
+			&expiresIn, &scope, &redirectURI, &createdAt, &userDataStr,
+			&authorizeDataCode, &prevAccessDataToken, &clientID)
 		if err != nil {
 			return nil, "", "", "", err
 		}
 		break
+	}
+
+	// Unmarshal user data from string
+	userData, err := getUserData(userDataStr)
+	if err != nil {
+		return nil, "", "", "", err
 	}
 
 	return &osin.AccessData{
@@ -215,6 +292,7 @@ func (store *SQLStorage) loadAccess(token string, isRefresh ...bool) (*osin.Acce
 		ExpiresIn:    expiresIn,
 		Scope:        scope,
 		RedirectUri:  redirectURI,
+		UserData:     userData,
 		CreatedAt:    createdAt,
 	}, authorizeDataCode, prevAccessDataToken, clientID, err
 }
