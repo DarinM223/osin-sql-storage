@@ -58,7 +58,6 @@ func (store *SQLStorage) Close() {
 }
 
 func getUserData(userData string) (interface{}, error) {
-	_ = "breakpoint"
 	// Return nil if there is no user data
 	if userData == "" {
 		return nil, nil

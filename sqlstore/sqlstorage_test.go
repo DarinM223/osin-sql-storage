@@ -60,6 +60,7 @@ func TestMain(m *testing.M) {
 	os.Exit(retCode)
 }
 
+// List of sample user data
 var userData = []interface{}{
 	map[string]interface{}{"Username": "user1", "Password": "pass1"},
 	map[string]interface{}{"Username": "user2", "Password": "pass2"},
@@ -69,12 +70,15 @@ var userData = []interface{}{
 // List of input tests for Client
 var clientTests = []*osin.DefaultClient{
 	&osin.DefaultClient{Id: "test", Secret: "secret", RedirectUri: "redirect", UserData: userData[0]},
+	&osin.DefaultClient{Id: "test2", Secret: "secret", RedirectUri: "redirect", UserData: nil},
 }
 
 // List of input tests for AuthorizeData
 var authDataTests = []osin.AuthorizeData{
 	osin.AuthorizeData{Code: "testcode", ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
 		State: "teststate", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[0]},
+	osin.AuthorizeData{Code: "testcode2", ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
+		State: "teststate", CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: nil},
 }
 
 // List of input tests for AccessData
@@ -88,6 +92,9 @@ var accessDataTests = []osin.AccessData{
 	osin.AccessData{AccessToken: "testaccesstoken3", RefreshToken: "testrefresh3",
 		ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
 		CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: userData[2]},
+	osin.AccessData{AccessToken: "testaccesstoken4", RefreshToken: "testrefresh4",
+		ExpiresIn: 100, Scope: "testscope", RedirectUri: "testredirect",
+		CreatedAt: time.Date(2015, 2, 30, 6, 30, 0, 0, time.Local), UserData: nil},
 }
 
 func TestRun(t *testing.T) {
@@ -125,7 +132,7 @@ func TestRun(t *testing.T) {
 func testClient(t *testing.T) {
 	for _, client := range clientTests {
 		testingContext.Store.SetClient(client)
-		retClient, err := testingContext.Store.GetClient("test")
+		retClient, err := testingContext.Store.GetClient(client.GetId())
 		if err != nil {
 			t.Error(err)
 		}
